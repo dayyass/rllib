@@ -9,6 +9,7 @@ setup(
     version="0.1.0",
     description="Reinforcement Learning Library.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Dani El-Ayyass",
     author_email="dayyass@yandex.ru",
     license_files=["LICENSE"],
