@@ -49,7 +49,7 @@ rewards = trainer.train(
 print(f"Mean reward: {np.mean(rewards[-10:])}")  # Mean reward: 8.0
 ```
 
-More examples you can find [here](examples).
+More examples you can find [here](https://github.com/dayyass/rllib/tree/main/examples).
 
 ## Requirements
 Python >= 3.7
