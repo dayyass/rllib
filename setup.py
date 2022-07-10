@@ -1,12 +1,14 @@
 from setuptools import setup
 
+from rllib import __version__
+
 with open("README.md", mode="r", encoding="utf-8") as fp:
     long_description = fp.read()
 
 
 setup(
     name="pytorch-rllib",
-    version="0.1.0",
+    version=__version__,
     description="Reinforcement Learning Library.",
     long_description=long_description,
     long_description_content_type="text/markdown",
