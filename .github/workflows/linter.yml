@@ -27,7 +27,6 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install isort black flake8 mypy
-        pip install .
     - name: Code format check with isort
       run: isort --check-only --profile black .
     - name: Code format check with black
