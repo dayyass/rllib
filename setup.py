@@ -1,0 +1,22 @@
+from setuptools import setup
+
+with open("README.md", mode="r", encoding="utf-8") as fp:
+    long_description = fp.read()
+
+
+setup(
+    name="pytorch-rllib",
+    version="0.1.0",
+    description="Reinforcement Learning Library.",
+    long_description=long_description,
+    author="Dani El-Ayyass",
+    author_email="dayyass@yandex.ru",
+    license_files=["LICENSE"],
+    url="https://github.com/dayyass/rllib",
+    packages=["rllib"],
+    install_requires=[
+        "gym==0.24.1",
+        "numpy==1.21.6",
+        "tqdm==4.64.0",
+    ],
+)

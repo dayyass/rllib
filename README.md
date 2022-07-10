@@ -7,6 +7,16 @@ pip install pytorch-rllib
 ```
 
 ## Usage
+Implemented agents:
+- [ ] CrossEntropy
+- [ ] Value / Policy Iteration
+- [x] Q-Learning
+- [ ] SARSA
+- [ ] DQN
+- [ ] Rainbow
+- [ ] REINFORCE
+- [ ] A2C
+
 ```python3
 import gym
 import numpy as np
