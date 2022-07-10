@@ -9,8 +9,8 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-black)](https://github.com/dayyass/rllib/blob/main/.pre-commit-config.yaml)
 [![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-[![pypi version](https://img.shields.io/pypi/v/rllib)](https://pypi.org/project/rllib)
-[![pypi downloads](https://img.shields.io/pypi/dm/rllib)](https://pypi.org/project/rllib)
+[![pypi version](https://img.shields.io/pypi/v/pytorch-rllib)](https://pypi.org/project/pytorch-rllib)
+[![pypi downloads](https://img.shields.io/pypi/dm/pytorch-rllib)](https://pypi.org/project/pytorch-rllib)
 
 # rllib
 Reinforcement Learning Library

@@ -25,6 +25,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install .
+        pip install -r requirements.txt
     - name: Unittests
       run: python -m unittest discover
