@@ -12,3 +12,7 @@
 
 venv
 .idea
+
+pytorch_rllib.egg-info
+build
+dist
