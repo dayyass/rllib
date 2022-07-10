@@ -1,3 +1,17 @@
+[![tests](https://github.com/dayyass/rllib/actions/workflows/tests.yml/badge.svg)](https://github.com/dayyass/rllib/actions/workflows/tests.yml)
+[![linter](https://github.com/dayyass/rllib/actions/workflows/linter.yml/badge.svg)](https://github.com/dayyass/rllib/actions/workflows/linter.yml)
+[![codecov](https://codecov.io/gh/dayyass/rllib/branch/main/graph/badge.svg?token=45O5NRAD8G)](https://codecov.io/gh/dayyass/rllib)
+
+[![python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://github.com/dayyass/rllib#requirements)
+[![release (latest by date)](https://img.shields.io/github/v/release/dayyass/rllib)](https://github.com/dayyass/rllib/releases/latest)
+[![license](https://img.shields.io/github/license/dayyass/rllib?color=blue)](https://github.com/dayyass/rllib/blob/main/LICENSE)
+
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-black)](https://github.com/dayyass/rllib/blob/main/.pre-commit-config.yaml)
+[![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+[![pypi version](https://img.shields.io/pypi/v/rllib)](https://pypi.org/project/rllib)
+[![pypi downloads](https://img.shields.io/pypi/dm/rllib)](https://pypi.org/project/rllib)
+
 # rllib
 Reinforcement Learning Library
 
