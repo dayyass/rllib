@@ -1,3 +1,4 @@
+gym==0.24.1
+numpy==1.21.6
 pre-commit==2.19.0  # dev
-torch==1.12.0
-transformers==4.20.1
+tqdm==4.64.0
