@@ -1,5 +1,5 @@
 # rllib
-Reinforcement Learning Library.
+Reinforcement Learning Library
 
 ## Installation
 ```
@@ -11,7 +11,7 @@ Implemented agents:
 - [ ] CrossEntropy
 - [ ] Value / Policy Iteration
 - [x] Q-Learning
-- [ ] SARSA
+- [x] Expected Value SARSA
 - [ ] DQN
 - [ ] Rainbow
 - [ ] REINFORCE

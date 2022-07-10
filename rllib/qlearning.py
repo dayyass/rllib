@@ -136,3 +136,38 @@ class QLearningAgent(_BaseAgent):
         )
 
         self._set_qvalue(state, action, q_value)
+
+
+class EVSarsaAgent(QLearningAgent):
+    """
+    Expected Value SARSA Agent.
+    """
+
+    def _get_value(
+        self,
+        state: int,
+    ) -> float:
+        """
+        Compute agent's estimate of V(s) using current q-values
+        V(s) = sum _{over a_i} {pi(a_i | s) * Q(s, a_i)}
+        """
+
+        possible_actions = range(self.n_actions)
+
+        if len(possible_actions) == 0:
+            return 0.0
+
+        q_values = [self._get_qvalue(state, action) for action in possible_actions]
+        max_q_value_idx = np.argmax(q_values)
+
+        value = 0.0
+
+        for i, q_value in enumerate(q_values):
+            if i == max_q_value_idx:
+                value += (
+                    (1 - self.epsilon) + self.epsilon / len(possible_actions)
+                ) * q_value
+            else:
+                value += (self.epsilon / len(possible_actions)) * q_value
+
+        return value
