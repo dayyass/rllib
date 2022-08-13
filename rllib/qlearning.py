@@ -1,9 +1,11 @@
 from collections import defaultdict
-from typing import Union
+from typing import Union, List
 
 import numpy as np
+import torch
 
 from rllib._base import _BaseAgent
+from rllib.utils import to_one_hot, where
 
 
 class QLearningAgent(_BaseAgent):
@@ -171,3 +173,121 @@ class EVSarsaAgent(QLearningAgent):
                 value += (self.epsilon / len(possible_actions)) * q_value
 
         return value
+
+
+class ApproximateQLearningAgent(_BaseAgent):
+    """
+    Approximate Q-Learning Agent.
+    """
+
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        alpha: float,
+        epsilon: float,
+        discount: float,
+        n_actions: int,  # TODO: maybe remove
+    ):
+        """
+        Q-Learning Agent Initialization.
+
+        Args:
+            model (torch.nn.Module): torch neural network.
+            alpha (float): learning rate.
+            epsilon (float): exploration probability.
+            discount (float): discount rate (aka gamma).
+            n_actions (int): number of possible actions.
+        """
+
+        self.model = model
+        self.alpha = alpha
+        self.epsilon = epsilon
+        self.discount = discount
+        self.n_actions = n_actions
+
+    def get_action(
+        self,
+        state: np.ndarray,
+    ) -> int:
+        """
+        Compute action in a state, including exploration.
+        """
+
+        action = np.random.choice(
+            a=[
+                self.get_best_action(state),
+                np.random.choice(range(self.n_actions)),
+            ],
+            p=[
+                1 - self.epsilon,
+                self.epsilon,
+            ],
+        )
+
+        return int(action)
+
+    def get_best_action(
+        self,
+        state: np.ndarray,
+    ) -> int:
+        """
+        Compute the best action to take in a state.
+        """
+
+        state = self._to_tensor(state[None])
+        q_values = self.model(state).detach().cpu().numpy()[0]
+
+        action = int(np.argmax(q_values))
+
+        return action
+
+    def update(
+        self,
+        states: List[np.ndarray],
+        actions: List[int],
+        rewards: List[float],
+        next_states: List[np.ndarray],
+        is_done: List[bool],
+    ) -> torch.Tensor:  # TODO: maybe do .backward() here
+        """
+        Compute TD loss:
+            L := 1/N * sum {(Q(s,a) - [r(s,a) + gamma * max_over_action[Q(s',a')]])**2}
+        """
+
+        states = self._to_tensor(states)
+        actions = self._to_tensor(actions)
+        rewards = self._to_tensor(rewards)
+        next_states = self._to_tensor(next_states)
+        is_done = self._to_tensor(is_done)
+
+        predicted_qvalues = self.model(states)
+        predicted_qvalues_for_actions = torch.sum(
+            predicted_qvalues * to_one_hot(actions, self.n_actions),
+            dim=1,
+        )
+
+        predicted_next_qvalues = self.model(next_states)
+        next_state_values = torch.max(predicted_next_qvalues, dim=1)[0]
+
+        target_qvalues_for_actions = where(
+            is_done,
+            rewards,
+            rewards + self.discount * next_state_values,
+        )
+
+        loss = torch.mean(
+            (predicted_qvalues_for_actions - target_qvalues_for_actions.detach()) ** 2
+        )
+
+        return loss
+
+    def _to_tensor(
+        self,
+        array: np.ndarray
+    ) -> torch.Tensor:
+        """
+        Convert np.ndarray to torch.Tensor on device.
+        """
+
+        device = next(self.model.parameters()).device
+        return torch.tensor(array, dtype=torch.float32, device=device)
