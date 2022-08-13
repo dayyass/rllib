@@ -12,7 +12,7 @@ set_global_seed(seed=42, env=env)
 n_actions = env.action_space.n
 
 # init q-learning agent
-q_learning_agent = QLearningAgent(
+agent_q_learning = QLearningAgent(
     alpha=0.5,
     epsilon=0.25,
     discount=0.99,
@@ -20,7 +20,7 @@ q_learning_agent = QLearningAgent(
 )
 
 # init expected value sarsa agent
-ev_sarsa_agent = EVSarsaAgent(
+agent_ev_sarsa = EVSarsaAgent(
     alpha=0.5,
     epsilon=0.25,
     discount=0.99,
@@ -30,16 +30,33 @@ ev_sarsa_agent = EVSarsaAgent(
 # train
 trainer = Trainer(env=env)
 
-rewards_q_learning = trainer.train(
-    agent=q_learning_agent,
+train_mean_rewards_q_learning = trainer.train(
+    agent=agent_q_learning,
     n_epochs=1000,
 )
 
-rewards_ev_sarsa = trainer.train(
-    agent=ev_sarsa_agent,
+train_mean_rewards_ev_sarsa = trainer.train(
+    agent=agent_ev_sarsa,
     n_epochs=1000,
 )
 
 # compare results
-print(f"Mean reward: {np.mean(rewards_q_learning[-10:])}")  # Mean reward: 8.0
-print(f"Mean reward: {np.mean(rewards_ev_sarsa[-10:])}")  # Mean reward: 7.6
+print(
+    f"Mean train reward: {np.mean(train_mean_rewards_q_learning[-10:])}"
+)  # reward: 8.0
+print(f"Mean train reward: {np.mean(train_mean_rewards_ev_sarsa[-10:])}")  # reward: 7.6
+
+# inference
+inference_reward_q_learning = trainer.play_session(
+    agent=agent_q_learning,
+    t_max=10**4,
+)
+
+inference_reward_ev_sarsa = trainer.play_session(
+    agent=agent_ev_sarsa,
+    t_max=10**4,
+)
+
+# compare results
+print(f"Inference reward: {inference_reward_q_learning}")  # reward: 7.0
+print(f"Inference reward: {inference_reward_ev_sarsa}")  # reward: 5.0

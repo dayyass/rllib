@@ -1,6 +1,6 @@
 import gym
-import torch
 import numpy as np
+import torch
 
 from rllib.qlearning import ApproximateQLearningAgent
 from rllib.trainer import TrainerTorch as Trainer
@@ -24,8 +24,8 @@ model.add_module("relu2", torch.nn.ReLU())
 model.add_module("values", torch.nn.Linear(64, n_actions))
 model = model.to(device)
 
-# init approximate q-learning agent
-approximate_q_learning_agent = ApproximateQLearningAgent(
+# init agent
+agent = ApproximateQLearningAgent(
     model=model,
     alpha=0.5,
     epsilon=0.5,
@@ -38,12 +38,21 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
 trainer = Trainer(env=env)
 
-rewards_approximate_q_learning = trainer.train(
-    agent=approximate_q_learning_agent,
+train_rewards = trainer.train(
+    agent=agent,
     optimizer=optimizer,
-    n_epochs=100,
+    n_epochs=20,
     n_sessions=100,
 )
 
-# compare results
-print(f"Mean reward: {np.mean(rewards_approximate_q_learning[-10:])}")  # Mean reward: 190.558
+# train results
+print(f"Mean train reward: {np.mean(train_rewards[-10:])}")  # reward: 120.318
+
+# inference
+inference_reward = trainer.play_session(
+    agent=agent,
+    t_max=10**4,
+)
+
+# inference results
+print(f"Inference reward: {inference_reward}")  # reward: 171.0

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
 import torch
@@ -241,7 +241,7 @@ class ApproximateQLearningAgent(_BaseAgent):
 
         return action
 
-    def update(
+    def update(  # type: ignore
         self,
         states: List[np.ndarray],
         actions: List[int],
@@ -281,10 +281,7 @@ class ApproximateQLearningAgent(_BaseAgent):
 
         return loss
 
-    def _to_tensor(
-        self,
-        array: np.ndarray
-    ) -> torch.Tensor:
+    def _to_tensor(self, array: np.ndarray) -> torch.Tensor:
         """
         Convert np.ndarray to torch.Tensor on device.
         """

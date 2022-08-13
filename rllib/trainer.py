@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 
-import torch
 import numpy as np
+import torch
 from gym import Env
 from tqdm import trange
 
@@ -52,6 +52,7 @@ class Trainer:
             r = self._play_session(
                 agent=agent,
                 t_max=t_max,
+                train=True,
             )
             rewards.append(r)
 
@@ -64,6 +65,7 @@ class Trainer:
         self,
         agent: _BaseAgent,
         t_max: int,
+        train: bool = False,
     ) -> float:
         """
         One session cycle.
@@ -71,6 +73,7 @@ class Trainer:
         Args:
             agent (_BaseAgent): RL agent.
             t_max (int): max number of one session actions.
+            train (bool, optional): train or inference phase. Defaults to False.
 
         Returns:
             float: session reward.
@@ -83,7 +86,8 @@ class Trainer:
             a = agent.get_action(s)
             next_s, r, done, _ = self.env.step(a)
 
-            agent.update(s, a, r, next_s)
+            if train:
+                agent.update(s, a, r, next_s)
 
             s = next_s
             total_reward += r
@@ -92,6 +96,29 @@ class Trainer:
 
         return total_reward
 
+    # TODO: allow exploration on/off
+    def play_session(
+        self,
+        agent: _BaseAgent,
+        t_max: int,
+    ) -> float:
+        """
+        Play inference session.
+
+        Args:
+            agent (_BaseAgent): RL agent.
+            t_max (int): max number of one session actions.
+
+        Returns:
+            float: session reward.
+        """
+
+        return self._play_session(
+            agent=agent,
+            t_max=t_max,
+            train=False,
+        )
+
 
 class TrainerTorch(Trainer):
     """
@@ -99,7 +126,7 @@ class TrainerTorch(Trainer):
     """
 
     # TODO: add joblib
-    def train(
+    def train(  # type: ignore
         self,
         agent: _BaseAgent,
         optimizer: torch.optim.Optimizer,
@@ -130,9 +157,7 @@ class TrainerTorch(Trainer):
             session_rewards = []
             for _ in range(n_sessions):
                 reward = self._play_session(
-                    agent=agent,
-                    optimizer=optimizer,
-                    t_max=t_max,
+                    agent=agent, t_max=t_max, optimizer=optimizer, train=True
                 )
                 session_rewards.append(reward)
 
@@ -140,25 +165,29 @@ class TrainerTorch(Trainer):
             rewards.append(mean_session_rewards)
 
             if verbose:
-                print(f"epoch #{n_epoch}\tmean reward = {mean_session_rewards:.3f}\tepsilon = {agent.epsilon:.3f}")
+                print(
+                    f"epoch #{n_epoch + 1}\tmean reward = {mean_session_rewards:.3f}\tepsilon = {agent.epsilon:.3f}"  # type: ignore
+                )
 
             agent.epsilon *= epsilon_decay  # type: ignore
 
         return rewards
 
-    def _play_session(
+    def _play_session(  # type: ignore
         self,
         agent: _BaseAgent,
-        optimizer: torch.optim.Optimizer,
         t_max: int,
+        optimizer: Optional[torch.optim.Optimizer] = None,
+        train: bool = False,
     ) -> float:
         """
         One session cycle.
 
         Args:
             agent (_BaseAgent): torch RL agent.
-            optimizer (torch.optim.Optimizer): torch optimizer.
             t_max (int): max number of one session actions.
+            optimizer (Optional[torch.optim.Optimizer]): torch optimizer. Defaults to None.
+            train (bool, optional): train or inference phase. Defaults to False.
 
         Returns:
             float: session reward.
@@ -171,9 +200,10 @@ class TrainerTorch(Trainer):
             a = agent.get_action(s)
             next_s, r, done, _ = self.env.step(a)
 
-            optimizer.zero_grad()
-            agent.update([s], [a], [r], [next_s], [done]).backward()
-            optimizer.step()
+            if train:
+                optimizer.zero_grad()  # type: ignore
+                agent.update([s], [a], [r], [next_s], [done]).backward()  # type: ignore
+                optimizer.step()  # type: ignore
 
             s = next_s
             total_reward += r
@@ -181,3 +211,27 @@ class TrainerTorch(Trainer):
                 break
 
         return total_reward
+
+    # TODO: allow exploration on/off
+    def play_session(
+        self,
+        agent: _BaseAgent,
+        t_max: int,
+    ) -> float:
+        """
+        Play inference session.
+
+        Args:
+            agent (_BaseAgent): RL agent.
+            t_max (int): max number of one session actions.
+
+        Returns:
+            float: session reward.
+        """
+
+        return self._play_session(
+            agent=agent,
+            t_max=t_max,
+            optimizer=None,
+            train=False,
+        )

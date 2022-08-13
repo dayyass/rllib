@@ -1,7 +1,7 @@
 import random
 
-import torch
 import numpy as np
+import torch
 from gym import Env
 
 
@@ -33,19 +33,18 @@ def to_one_hot(
     """
     Helper function that takes an integer vector and convert it to 1-hot matrix.
     """
-    
+
     device = y_tensor.device
-    
+
     y_tensor = torch.tensor(
         y_tensor,
         dtype=torch.long,
         device=device,
     ).view(-1, 1)
 
-    y_one_hot = torch.zeros(
-        y_tensor.size()[0], n_dims,
-        device=device
-    ).scatter_(1, y_tensor, 1)
+    y_one_hot = torch.zeros(y_tensor.size()[0], n_dims, device=device).scatter_(
+        1, y_tensor, 1
+    )
 
     return y_one_hot
 
@@ -58,5 +57,5 @@ def where(
     """
     Helper function like np.where but in torch.
     """
-    
-    return (cond * x_1) + ((1-cond) * x_2)
+
+    return (cond * x_1) + ((1 - cond) * x_2)
