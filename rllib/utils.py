@@ -34,11 +34,18 @@ def to_one_hot(
     Helper function that takes an integer vector and convert it to 1-hot matrix.
     """
     
-    y_tensor = y_tensor.type(torch.LongTensor).view(-1, 1)
+    device = y_tensor.device
+    
+    y_tensor = torch.tensor(
+        y_tensor,
+        dtype=torch.long,
+        device=device,
+    ).view(-1, 1)
 
     y_one_hot = torch.zeros(
-        y_tensor.size()[0], n_dims
-    ).scatter_(1, y_tensor, 1).to(y_tensor.device)
+        y_tensor.size()[0], n_dims,
+        device=device
+    ).scatter_(1, y_tensor, 1)
 
     return y_one_hot
 

@@ -59,6 +59,7 @@ class Trainer:
 
         return rewards
 
+    # TODO: add joblib
     def _play_session(
         self,
         agent: _BaseAgent,
@@ -97,6 +98,7 @@ class TrainerTorch(Trainer):
     Class to train torch agent in environment.
     """
 
+    # TODO: add joblib
     def train(
         self,
         agent: _BaseAgent,

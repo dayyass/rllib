@@ -28,7 +28,7 @@ model = model.to(device)
 approximate_q_learning_agent = ApproximateQLearningAgent(
     model=model,
     alpha=0.5,
-    epsilon=0.25,
+    epsilon=0.5,
     discount=0.99,
     n_actions=n_actions,
 )
@@ -46,4 +46,4 @@ rewards_approximate_q_learning = trainer.train(
 )
 
 # compare results
-print(f"Mean reward: {np.mean(rewards_approximate_q_learning[-10:])}")  # Mean reward: 8.0
+print(f"Mean reward: {np.mean(rewards_approximate_q_learning[-10:])}")  # Mean reward: 190.558
