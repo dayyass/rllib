@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import gym
 import numpy as np
 from gym.core import ObservationWrapper
@@ -11,12 +13,15 @@ env = gym.make("CartPole-v0")
 
 
 class Binarizer(ObservationWrapper):
-    def observation(self, state):
+    def observation(
+        self,
+        state: np.ndarray,
+    ) -> Tuple[float]:
         state[0] = round(state[0], 1)
         state[1] = round(state[1], 1)
         state[2] = round(state[2], 1)
         state[3] = round(state[3], 1)
-        return tuple(state)
+        return tuple(state)  # type: ignore
 
 
 env = Binarizer(env)
