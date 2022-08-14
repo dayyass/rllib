@@ -26,13 +26,14 @@ class Trainer:
 
         self.env = env
 
-    # TODO: add verbose
     def train(
         self,
         agent: _BaseAgent,
         n_epochs: int,
         epsilon_decay: float = 0.99,
         t_max: int = 10**4,
+        verbose: bool = True,
+        frequency: int = 100,
     ) -> List[float]:
         """
         Train loop over epochs.
@@ -42,19 +43,27 @@ class Trainer:
             n_epochs (int): number of epochs to train.
             epsilon_decay (float, optional): epsilon decay. Defaults to 0.99.
             t_max (int, optional): max number of one session actions. Defaults to 10**4.
+            verbose (bool, optional): verbose to print. Defaults to True.
+            frequency (bool, optional): epochs interval between verbose statements. Defaults to 100.
 
         Returns:
             List[float]: rewards over epochs.
         """
 
         rewards = []
-        for _ in trange(n_epochs, desc="loop over epochs"):
-            r = self._play_session(
+        for n_epoch in trange(n_epochs, desc="loop over epochs"):
+            reward = self._play_session(
                 agent=agent,
                 t_max=t_max,
                 train=True,
             )
-            rewards.append(r)
+            rewards.append(reward)
+
+            if verbose:
+                if (n_epoch + 1) % frequency == 0:
+                    print(
+                        f"epoch #{n_epoch + 1}\tmean reward = {reward:.3f}\tepsilon = {agent.epsilon:.3f}"  # type: ignore
+                    )
 
             agent.epsilon *= epsilon_decay  # type: ignore
 
@@ -135,6 +144,7 @@ class TrainerTorch(Trainer):
         epsilon_decay: float = 0.99,
         t_max: int = 10**4,
         verbose: bool = True,
+        frequency: int = 1,
     ) -> List[float]:
         """
         Train loop over epochs.
@@ -147,6 +157,7 @@ class TrainerTorch(Trainer):
             epsilon_decay (float, optional): epsilon decay. Defaults to 0.99.
             t_max (int, optional): max number of one session actions. Defaults to 10**4.
             verbose (bool, optional): verbose to print. Defaults to True.
+            frequency (bool, optional): epochs interval between verbose statements. Defaults to 1.
 
         Returns:
             List[float]: rewards over epochs.
@@ -165,9 +176,10 @@ class TrainerTorch(Trainer):
             rewards.append(mean_session_rewards)
 
             if verbose:
-                print(
-                    f"epoch #{n_epoch + 1}\tmean reward = {mean_session_rewards:.3f}\tepsilon = {agent.epsilon:.3f}"  # type: ignore
-                )
+                if (n_epoch + 1) % frequency == 0:
+                    print(
+                        f"epoch #{n_epoch + 1}\tmean reward = {mean_session_rewards:.3f}\tepsilon = {agent.epsilon:.3f}"  # type: ignore
+                    )
 
             agent.epsilon *= epsilon_decay  # type: ignore
 
