@@ -33,9 +33,14 @@ class PreprocessAtariObs(ObservationWrapper):
 
 
 def PrimaryAtariWrap(env: Env) -> Env:
+    """
+    All Atari Wrappers in one.
+    """
+
     env = atari_wrappers.MaxAndSkipEnv(env, skip=4)
     env = atari_wrappers.EpisodicLifeEnv(env)
     env = atari_wrappers.FireResetEnv(env)
     env = atari_wrappers.ClipRewardEnv(env)
     env = PreprocessAtariObs(env)
+
     return env

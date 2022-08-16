@@ -397,7 +397,7 @@ class DQN(ApproximateQLearningAgent):
         """
 
         states = self._to_tensor(states)
-        actions = self._to_tensor(actions)
+        actions = self._to_tensor(actions).long()
         rewards = self._to_tensor(rewards)
         next_states = self._to_tensor(next_states)
         is_dones = self._to_tensor(is_dones)

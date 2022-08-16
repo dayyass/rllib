@@ -1,6 +1,7 @@
 from typing import Tuple
 
 import gym
+import numpy as np
 import torch
 from tqdm import trange
 from utils import PrimaryAtariWrap
@@ -89,3 +90,64 @@ for i in trange(100, desc="fill exp_replay loop"):
     )
 
 print(f"Experience replay buffer size: {len(exp_replay)}")
+
+
+# # epsilon scheduler
+class LinearDecayEpsilonScheduler:
+    def __init__(
+        self,
+        init_epsilon: float,
+        final_epsilon: float,
+        decay_steps: int,
+    ):
+        self.init_epsilon = init_epsilon
+        self.final_epsilon = final_epsilon
+        self.decay_steps = decay_steps
+
+    def __call__(
+        self,
+        current_step: int,
+    ):
+        if current_step >= self.decay_steps:
+            return self.final_epsilon
+
+        return (
+            self.init_epsilon * (self.decay_steps - current_step)
+            + self.final_epsilon * current_step
+        ) / self.decay_steps
+
+
+epsilon_scheduler = LinearDecayEpsilonScheduler(
+    init_epsilon=1.0,
+    final_epsilon=0.3,
+    decay_steps=10**6,
+)
+
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+train_rewards = trainer.train(
+    agent=agent,
+    exp_replay=exp_replay,
+    optimizer=optimizer,
+    n_steps=3 * 10**6,
+    batch_size=16,
+    transitions_per_step=1,
+    refresh_target_network_freq=5000,
+    epsilon_scheduler=epsilon_scheduler,
+    max_grad_norm=50,
+    t_max=10000,
+    verbose=True,
+    frequency=5000,
+)
+
+# train results
+print(f"Mean train reward: {np.mean(train_rewards[-10:])}")
+
+# inference
+inference_reward = trainer.play_session(
+    agent=agent,
+    t_max=10**4,
+)
+
+# inference results
+print(f"Inference reward: {inference_reward}")

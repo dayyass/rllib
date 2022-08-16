@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -138,7 +138,7 @@ class TrainerTorch(Trainer):
     # TODO: add joblib
     def train(  # type: ignore
         self,
-        agent: _BaseAgent,
+        agent: _BaseAgent,  # TODO: map agents with trainers
         optimizer: torch.optim.Optimizer,
         n_epochs: int,
         n_sessions: int,
@@ -299,3 +299,127 @@ class TrainerTorchWithReplayBuffer(TrainerTorch):
                 continue
 
         return total_reward, s
+
+    # TODO: standartize
+    # TODO: allow exploration on/off
+    def play_session(
+        self,
+        agent: _BaseAgent,
+        t_max: int,
+    ) -> float:
+        """
+        Play inference session.
+
+        Args:
+            agent (_BaseAgent): RL agent.
+            t_max (int): max number of one session actions.
+
+        Returns:
+            float: session reward.
+        """
+
+        total_reward = 0.0
+        s = self.env.reset()
+
+        for _ in range(t_max):
+            a = agent.get_action([s])
+            next_s, r, done, _ = self.env.step(a)
+
+            s = next_s
+            total_reward += r
+            if done:
+                break
+
+        return total_reward
+
+    # TODO: add joblib
+    def train(  # type: ignore
+        self,
+        agent: _BaseAgent,  # TODO: map agents with trainers
+        exp_replay: ReplayBuffer,
+        optimizer: torch.optim.Optimizer,
+        n_steps: int,
+        batch_size: int,
+        transitions_per_step: int,
+        refresh_target_network_freq: int,
+        epsilon_scheduler: Callable,
+        max_grad_norm: float,
+        t_max: int,
+        verbose: bool = True,
+        frequency: int = 1,
+    ) -> List[float]:
+        """
+        Train loop.
+
+        Args:
+            agent (_BaseAgent): torch RL agent.
+            exp_replay (ReplayBuffer): experience replay buffer.
+            optimizer (torch.optim.Optimizer): torch optimizer.
+            n_steps (int): number of steps (iterations) to train.
+            batch_size (int): number of transitions to sample from exp_replay.
+            transitions_per_step (int): number of transitions to play per step.
+            refresh_target_network_freq (int): how often update target network weights.
+            epsilon_scheduler (Callable): epsilon scheduler that updates agent.epsilon.
+            max_grad_norm (Callable): max gradient norm for gradient cliping.
+            t_max (int): max number of one inference session actions.
+            verbose (bool, optional): verbose to print. Defaults to True.
+            frequency (bool, optional): epochs interval between verbose statements. Defaults to 1.
+
+        Returns:
+            List[float]: rewards over epochs.
+        """
+
+        rewards_list = []
+        state = self.env.reset()
+
+        for step in trange(n_steps, desc="loop over steps"):
+            agent.epsilon = epsilon_scheduler(step)  # type: ignore
+
+            _, state = self.play_and_record(
+                initial_state=state,
+                agent=agent,
+                exp_replay=exp_replay,
+                n_steps=transitions_per_step,
+            )
+
+            states, actions, rewards, next_states, is_dones = exp_replay.sample(
+                batch_size
+            )
+
+            optimizer.zero_grad()
+            loss = agent.update(  # type: ignore
+                states=states,
+                actions=actions,
+                rewards=rewards,
+                next_states=next_states,
+                is_dones=is_dones,
+            )
+            loss.backward()
+            grad_norm = torch.nn.utils.clip_grad_norm_(
+                agent.model.parameters(),  # type: ignore
+                max_norm=max_grad_norm,
+            )
+            optimizer.step()
+
+            if (step + 1) % refresh_target_network_freq == 0:
+                agent.target_network.load_state_dict(agent.model.state_dict())  # type: ignore
+
+            # TODO: add tensorboard
+            if verbose:
+                if (step + 1) % frequency == 0:
+                    print(
+                        f"step #{step + 1}\tloss = {loss.item():.3f}\tgrad norm = {grad_norm:.3f}"  # type: ignore
+                    )
+                    print(
+                        f"step #{step + 1}\texp_replay size = {len(exp_replay)}\tepsilon = {agent.epsilon:.3f}"  # type: ignore
+                    )
+                    reward = self.play_session(
+                        agent=agent,
+                        t_max=t_max,
+                    )
+                    print(
+                        f"step #{step + 1}\tinference reward = {reward}"  # type: ignore
+                    )
+                    rewards_list.append(reward)
+
+        return rewards_list
