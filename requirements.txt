@@ -1,6 +1,8 @@
-coverage==6.4.1  # dev
-gym==0.24.1
+coverage==6.4.3  # dev
+gym==0.25.1
+gym[atari,accept-rom-license]==0.25.1
 numpy==1.21.6
+Pillow==9.2.0
 pre-commit==2.19.0  # dev
 torch==1.12.1
 tqdm==4.64.0

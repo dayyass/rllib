@@ -27,7 +27,7 @@ Implemented agents:
 - [x] Q-Learning
 - [x] Expected Value SARSA
 - [x] Approximate Q-Learning
-- [ ] DQN
+- [x] DQN
 - [ ] Rainbow
 - [ ] REINFORCE
 - [ ] A2C
