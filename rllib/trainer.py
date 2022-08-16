@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -6,6 +6,7 @@ from gym import Env
 from tqdm import trange
 
 from rllib._base import _BaseAgent
+from rllib.replay_buffer import ReplayBuffer
 
 
 class Trainer:
@@ -247,3 +248,54 @@ class TrainerTorch(Trainer):
             optimizer=None,
             train=False,
         )
+
+
+# TODO: maybe inherit from Trainer
+# TODO: add _BaseTrainer
+class TrainerTorchWithReplayBuffer(TrainerTorch):
+    """
+    Class to train torch agent in environment with replay buffer.
+    """
+
+    def play_and_record(
+        self,
+        initial_state: np.ndarray,
+        agent: _BaseAgent,
+        exp_replay: ReplayBuffer,
+        n_steps: int,
+    ) -> Tuple[float, np.ndarray]:
+        """
+        Play n_steps in one session and record transition in experience replay buffer.
+
+        Args:
+            initial_state (np.ndarray): initial environmant state.
+            agent (_BaseAgent): torch RL agent.
+            exp_replay (ReplayBuffer): experience replay buffer.
+            n_steps (int): number of steps to play in one session.
+
+        Returns:
+            Tuple[float, np.ndarray]: session reward and initial state.
+        """
+
+        total_reward = 0.0
+        s = initial_state
+
+        for _ in range(n_steps):
+            a = agent.get_action([s])
+            next_s, r, done, _ = self.env.step(a)
+
+            exp_replay.add(
+                state=s,
+                action=a,
+                reward=r,
+                next_state=next_s,
+                is_done=done,
+            )
+
+            s = next_s
+            total_reward += r
+            if done:
+                s = self.env.reset()
+                continue
+
+        return total_reward, s
