@@ -27,7 +27,6 @@ model = model.to(device)
 # init agent
 agent = ApproximateQLearningAgent(
     model=model,
-    alpha=0.5,
     epsilon=0.5,
     discount=0.99,
     n_actions=n_actions,

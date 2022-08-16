@@ -184,7 +184,6 @@ class ApproximateQLearningAgent(_BaseAgent):
     def __init__(
         self,
         model: torch.nn.Module,
-        alpha: float,
         epsilon: float,
         discount: float,
         n_actions: int,  # TODO: maybe remove
@@ -194,14 +193,12 @@ class ApproximateQLearningAgent(_BaseAgent):
 
         Args:
             model (torch.nn.Module): torch neural network.
-            alpha (float): learning rate.
             epsilon (float): exploration probability.
             discount (float): discount rate (aka gamma).
             n_actions (int): number of possible actions.
         """
 
         self.model = model
-        self.alpha = alpha
         self.epsilon = epsilon
         self.discount = discount
         self.n_actions = n_actions
@@ -311,7 +308,6 @@ class DQN(ApproximateQLearningAgent):
         self,
         model: torch.nn.Module,
         target_network: torch.nn.Module,
-        alpha: float,
         epsilon: float,
         discount: float,
         n_actions: int,  # TODO: maybe remove
@@ -322,7 +318,6 @@ class DQN(ApproximateQLearningAgent):
         Args:
             model (torch.nn.Module): torch neural network.
             target_network (torch.nn.Module): DQN target network.
-            alpha (float): learning rate.
             epsilon (float): exploration probability.
             discount (float): discount rate (aka gamma).
             n_actions (int): number of possible actions.
@@ -330,7 +325,6 @@ class DQN(ApproximateQLearningAgent):
 
         super().__init__(
             model=model,
-            alpha=alpha,
             epsilon=epsilon,
             discount=discount,
             n_actions=n_actions,
