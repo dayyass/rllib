@@ -308,7 +308,7 @@ class DQN(ApproximateQLearningAgent):
         self,
         model: torch.nn.Module,
         target_network: torch.nn.Module,
-        epsilon: float,
+        epsilon: float,  # TODO: maybe remove because of scheduler
         discount: float,
         n_actions: int,  # TODO: maybe remove
     ):
