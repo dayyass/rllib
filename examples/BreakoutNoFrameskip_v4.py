@@ -5,7 +5,7 @@ import torch
 from tqdm import trange
 from utils import PrimaryAtariWrap
 
-from rllib.framebuffer import FrameBuffer
+from rllib.frame_buffer import FrameBuffer
 from rllib.qlearning import DQN
 from rllib.replay_buffer import ReplayBuffer
 from rllib.trainer import TrainerTorchWithReplayBuffer as Trainer
