@@ -18,8 +18,11 @@ setup(
     url="https://github.com/dayyass/rllib",
     packages=["rllib"],
     install_requires=[
-        "gym==0.24.1",
+        "gym==0.25.1",
+        "gym[atari,accept-rom-license]==0.25.1",
         "numpy==1.21.6",
+        "Pillow==9.2.0",
+        "torch==1.12.1",
         "tqdm==4.64.0",
     ],
 )
