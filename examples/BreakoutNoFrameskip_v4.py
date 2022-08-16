@@ -2,10 +2,10 @@ from typing import Tuple
 
 import gym
 import torch
-from framebuffer import FrameBuffer
 from tqdm import trange
 from utils import PrimaryAtariWrap
 
+from rllib.framebuffer import FrameBuffer
 from rllib.qlearning import DQN
 from rllib.replay_buffer import ReplayBuffer
 from rllib.trainer import TrainerTorchWithReplayBuffer as Trainer

@@ -5,11 +5,23 @@ from gym.spaces import Box
 
 
 class FrameBuffer(Wrapper):
+    """
+    Frame Buffer.
+    """
+
     def __init__(
         self,
         env: Env,
         n_frames: int = 4,
     ):
+        """
+        Init Frame Buffer.
+
+        Args:
+            env (Env): gym environment.
+            n_frames (int, optional): number of frames to handle at a time. Defaults to 4.
+        """
+
         super().__init__(env)
 
         n_channels, height, width = env.observation_space.shape
