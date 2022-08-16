@@ -34,10 +34,9 @@ agent = ApproximateQLearningAgent(
 )
 
 # train
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-
 trainer = Trainer(env=env)
 
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 train_rewards = trainer.train(
     agent=agent,
     optimizer=optimizer,
